@@ -54,12 +54,16 @@ jobs:
 
       # 4. 提交并推送修改
       - name: Commit and push version bump
+        env:
+          RAW_TAG: ${{ github.event.release.tag_name }}
         run: |
           VERSION="${RAW_TAG#v}"
           git add pyproject.toml
           # 仅在有变更时才提交
           if ! git diff --cached --quiet; then
-            git commit -m "chore: bump version to $VERSION"
+            CMSG="chore: bump version to $VERSION"
+            echo "$CMSG"
+            git commit -m "$CMSG"
             # 推向同一个分支，而不是 Tag
             git push origin HEAD:${{ github.event.release.target_commitish }}
           else
