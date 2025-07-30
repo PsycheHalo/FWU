@@ -13,14 +13,41 @@ on:
     types: [published]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   release-build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # 1. 检出完整仓库（必须拿到所有历史以便 push）
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. 配置 Git 用户
+      - name: Configure Git for version bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # 3. 从 Release tag 自动提取版本并更新 pyproject.toml
+      - name: Bump version in pyproject.toml
+        run: |
+          RAW_TAG="${{ github.event.release.tag_name }}"
+          VERSION="${RAW_TAG#v}"
+          echo "🔖 Bumping version to $VERSION"
+          sed -i \
+            -e "s/^version = \".*\"/version = \"${VERSION}\"/" \
+            pyproject.toml
+
+      # 4. 提交并推送修改
+      - name: Commit and push version bump
+        run: |
+          git add pyproject.toml
+          git commit -m "chore: bump version to ${VERSION}"
+          git push
 
       - uses: actions/setup-python@v5
         with:
