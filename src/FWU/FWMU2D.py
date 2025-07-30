@@ -17,8 +17,8 @@ class FWMU2D(torch.nn.Module):
         if padding_mode_N is None:
             padding_mode_N=padding_mode
             
-        self.ConvP=torch.nn.Conv2d(in_channels,out_channels,kernel_size,stride=stride,padding=padding,dilation=dilation,groups=groups,padding_mode=padding_mode,bias=False,**kwargs)
-        self.ConvN=torch.nn.Conv2d(in_channels,out_channels,kernel_size_N,stride=stride_N,padding=padding_N,dilation=dilation_N,groups=groups_N,padding_mode=padding_mode_N,bias=False,**kwargs)
+        self.ConvP=torch.nn.Conv2d(in_channels,out_channels,kernel_size,stride=stride,padding=padding,dilation=dilation,groups=groups,padding_mode=padding_mode,bias=True,**kwargs)
+        self.ConvN=torch.nn.Conv2d(in_channels,out_channels,kernel_size_N,stride=stride_N,padding=padding_N,dilation=dilation_N,groups=groups_N,padding_mode=padding_mode_N,bias=True,**kwargs)
         
         if bias:
             self.bias=torch.nn.Parameter(torch.zeros((out_channels,1,1),**kwargs),requires_grad=True)
