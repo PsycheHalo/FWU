@@ -25,6 +25,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # 指定检出到发布时基于的分支（避免 detached HEAD）
+          ref: ${{ github.event.release.target_commitish }}
 
       # 2. 配置 Git 用户
       - name: Configure Git for version bump
@@ -46,8 +48,14 @@ jobs:
       - name: Commit and push version bump
         run: |
           git add pyproject.toml
-          git commit -m "chore: bump version to ${VERSION}"
-          git push
+          # 仅在有变更时才提交
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: bump version to ${VERSION}"
+            # 推向同一个分支，而不是 Tag
+            git push origin HEAD:${{ github.event.release.target_commitish }}
+          else
+            echo "No version change detected, skipping commit."
+          fi
 
       - uses: actions/setup-python@v5
         with:
