@@ -55,6 +55,7 @@ jobs:
       # 4. 提交并推送修改
       - name: Commit and push version bump
         run: |
+          VERSION="${RAW_TAG#v}"
           git add pyproject.toml
           # 仅在有变更时才提交
           if ! git diff --cached --quiet; then
