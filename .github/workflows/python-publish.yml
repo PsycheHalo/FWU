@@ -57,7 +57,7 @@ jobs:
           git add pyproject.toml
           # 仅在有变更时才提交
           if ! git diff --cached --quiet; then
-            git commit -m "chore: bump version to $VERSION"
+            eval git commit -m "chore: bump version to $VERSION"
             # 推向同一个分支，而不是 Tag
             git push origin HEAD:${{ github.event.release.target_commitish }}
           else
