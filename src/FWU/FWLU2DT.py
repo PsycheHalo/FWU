@@ -1,5 +1,9 @@
 import torch
 import math
+try:
+    from .transOrthogonal_ import transOrthogonal_
+except ImportError:
+    from transOrthogonal_ import transOrthogonal_
 
 class FWLU2DT(torch.nn.Module):
     def __init__(self,in_channels,out_channels,kernel_size,stride=1,padding=0,output_padding=0,dilation=1,groups=1,padding_mode='zeros',bias=True,gain=1,kernel_size_N=None,stride_N=None,padding_N=None,output_padding_N=None,dilation_N=None,groups_N=None,padding_mode_N=None,**kwargs):
@@ -28,8 +32,8 @@ class FWLU2DT(torch.nn.Module):
             self.bias=None
               
         with torch.no_grad():
-            torch.nn.init.orthogonal_(self.ConvP.weight,gain=gain)
-            torch.nn.init.orthogonal_(self.ConvN.weight,gain=gain)
+            transOrthogonal_(self.ConvP.weight,gain=gain)
+            transOrthogonal_(self.ConvN.weight,gain=gain)
         
     def forward(self,input):
         inputP=input.clamp(min=0)
