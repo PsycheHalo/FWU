@@ -40,9 +40,16 @@ jobs:
           RAW_TAG="${{ github.event.release.tag_name }}"
           VERSION="${RAW_TAG#v}"
           echo "🔖 Bumping version to $VERSION"
-          sed -i \
-            -e "s/^version = \".*\"/version = \"${VERSION}\"/" \
+          echo "📄 Before replacement:"
+          sed -n 's/^[[:space:]]*version[[:space:]]*=.*$/&/p' pyproject.toml
+          
+          # 这个正则能匹配任意缩进下的 version = "…"
+          sed -i -E \
+            -e "s/^([[:space:]]*version[[:space:]]*=[[:space:]]*)\"[^\"]+\"/\\1\"${VERSION}\"/" \
             pyproject.toml
+          
+          echo "📄 After replacement:"
+          sed -n 's/^[[:space:]]*version[[:space:]]*=.*$/&/p' pyproject.toml
 
       # 4. 提交并推送修改
       - name: Commit and push version bump
