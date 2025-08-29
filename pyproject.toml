@@ -1,6 +1,6 @@
 [project]
 name="FWU"
-version="0.0.3"
+version="0.0.4"
 authors=[{name="Psyche Halo", email="Psyche@WinsGod.com"},]
 description="FWU is a series of PyTorch-based neural network units. It has higher information utilization, prevents neuronal necrosis, and eliminates the need to add additionall activation functions. "
 readme = "README.md"
