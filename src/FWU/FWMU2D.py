@@ -2,7 +2,7 @@ import torch
 import math
 
 class FWMU2D(torch.nn.Module):
-    def __init__(self,in_channels,out_channels,kernel_size,stride=1,padding=0,dilation=1,groups=1,padding_mode='zeros',bias=True,gain=1,kernel_size_N=None,stride_N=None,padding_N=None,dilation_N=None,groups_N=None,padding_mode_N=None,**kwargs):
+    def __init__(self,in_channels,out_channels,kernel_size,stride=1,padding=0,dilation=1,groups=1,padding_mode='zeros',bias=True,gain=1,kernel_size_N=None,stride_N=None,padding_N=None,dilation_N=None,groups_N=None,padding_mode_N=None,gain_N=None,**kwargs):
         super(FWMU2D, self).__init__()
         if kernel_size_N is None:
             kernel_size_N=kernel_size
@@ -16,6 +16,8 @@ class FWMU2D(torch.nn.Module):
             groups_N=groups
         if padding_mode_N is None:
             padding_mode_N=padding_mode
+        if gain_N is None:
+            gain_N=gain
             
         self.ConvP=torch.nn.Conv2d(in_channels,out_channels,kernel_size,stride=stride,padding=padding,dilation=dilation,groups=groups,padding_mode=padding_mode,bias=True,**kwargs)
         self.ConvN=torch.nn.Conv2d(in_channels,out_channels,kernel_size_N,stride=stride_N,padding=padding_N,dilation=dilation_N,groups=groups_N,padding_mode=padding_mode_N,bias=True,**kwargs)
@@ -26,9 +28,10 @@ class FWMU2D(torch.nn.Module):
             self.bias=None
 
         g=math.sqrt(math.sqrt(1+gain**2)-1)
+        g_N=math.sqrt(math.sqrt(1+gain_N**2)-1)
         with torch.no_grad():
             torch.nn.init.orthogonal_(self.ConvP.weight,gain=g)
-            torch.nn.init.orthogonal_(self.ConvN.weight,gain=g)
+            torch.nn.init.orthogonal_(self.ConvN.weight,gain=g_N)
             torch.nn.init.normal_(self.ConvP.bias)
             self.ConvP.bias.data.sign_()
             torch.nn.init.normal_(self.ConvN.bias)
@@ -44,3 +47,4 @@ class FWMU2D(torch.nn.Module):
         
         return output
   
+
